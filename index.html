@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Flogas Solar Customer Response Form</title>
+<style>
+  body {
+    font-family: 'Arial', sans-serif;
+    background: #f4f6f8;
+    color: #111;
+    padding: 24px;
+  }
+
+  .card {
+    max-width: 640px;
+    margin: 30px auto;
+    background: #fff;
+    padding: 28px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    border-top: 6px solid #662d91;
+    position: relative;
+  }
+
+  .logo {
+    position: absolute;
+    top: 18px;
+    right: 20px;
+    width: 100px;
+  }
+
+  h1 {
+    margin: 0 0 12px;
+    font-size: 22px;
+    color: #662d91;
+    max-width: 75%;
+    line-height: 1.3;
+  }
+
+  label {
+    display: block;
+    margin: 16px 0 6px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  input[type="text"], textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #dfe3e8;
+    border-radius: 6px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  input[type="text"]:focus, textarea:focus {
+    outline: none;
+    border-color: #00b5ad;
+    box-shadow: 0 0 0 3px rgba(0,181,173,0.2);
+  }
+
+  .slider-container {
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  .slider {
+    width: 100%;
+    height: 10px;
+    border-radius: 6px;
+    appearance: none;
+    background: linear-gradient(to right, red, orange, yellow, limegreen);
+    outline: none;
+  }
+
+  .slider::-webkit-slider-thumb,
+  .slider::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #662d91;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+
+  .score-value {
+    margin-top: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #00b5ad;
+  }
+
+  .actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+  }
+
+  button[type="submit"], #clearBtn {
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  button[type="submit"] {
+    background: #00b5ad;
+    color: white;
+  }
+
+  button[type="submit"]:hover {
+    background: #009d96;
+  }
+
+  #clearBtn {
+    background: #662d91;
+    color: white;
+  }
+
+  #clearBtn:hover {
+    background: #55247a;
+  }
+
+  .message {
+    margin-top: 14px;
+    font-size: 14px;
+    color: #333;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <img src="https://www.flogas.co.uk/app/themes/flogas/images/og_default.png" alt="Flogas Logo" class="logo">
+    <h1>Flogas Solar Customer Response Form</h1>
+    <form id="npsForm">
+      <label for="name">Name <span style="color:red;">*</span></label>
+      <input id="name" name="Name" type="text" placeholder="Jane Doe" required>
+
+      <label>Score (0-10)</label>
+      <div class="slider-container">
+        <input type="range" id="score" min="0" max="10" value="5" class="slider">
+        <div class="score-value" id="scoreValue">5</div>
+      </div>
+
+      <label for="comments">Comments (optional)</label>
+      <textarea id="comments" name="Comments" rows="3" placeholder="Tell us why..."></textarea>
+
+      <div class="actions">
+        <button type="submit">Submit</button>
+        <button type="button" id="clearBtn">Clear</button>
+      </div>
+
+      <div class="message" id="messageArea" role="status" aria-live="polite"></div>
+    </form>
+  </div>
+
+<script>
+(function(){
+  // ✅ Connected to your Google Apps Script
+  const endpoint = "https://script.google.com/macros/s/AKfycbw3iuX0AX0BxwaRjTdFxGJLfAU-AcbF1AXq_yVsdhSAzo2ow4qmTbHcss1j5_x39j2S/exec";
+  const form = document.getElementById('npsForm');
+  const msg = document.getElementById('messageArea');
+  const slider = document.getElementById('score');
+  const scoreValue = document.getElementById('scoreValue');
+  const nameField = document.getElementById('name');
+
+  slider.addEventListener('input', () => {
+    scoreValue.textContent = slider.value;
+  });
+
+  document.getElementById('clearBtn').addEventListener('click', () => {
+    form.reset();
+    slider.value = 5;
+    scoreValue.textContent = '5';
+    msg.textContent = '';
+  });
+
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    msg.textContent = '';
+
+    if (!nameField.value.trim()) {
+      msg.textContent = 'Please enter your name before submitting.';
+      nameField.focus();
+      return;
+    }
+
+    const payload = {
+      Name: nameField.value.trim(),
+      Score: Number(slider.value),
+      Comments: document.getElementById('comments').value.trim()
+    };
+
+    try {
+      msg.textContent = 'Submitting...';
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        mode: 'no-cors', // 👈 Required for Google Apps Script
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      msg.textContent = '✅ Thanks — your response was recorded.';
+      form.reset();
+      slider.value = 5;
+      scoreValue.textContent = '5';
+    } catch (err) {
+      msg.textContent = '❌ Submission failed: ' + (err.message || 'Unknown error');
+    }
+  });
+})();
+</script>
+</body>
+</html>
