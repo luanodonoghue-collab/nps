@@ -43,6 +43,7 @@
     margin: 16px 0 6px;
     font-weight: 600;
     color: #333;
+    font-family: 'Arial', sans-serif;
   }
 
   input[type="text"], textarea {
@@ -51,6 +52,7 @@
     border: 1px solid #dfe3e8;
     border-radius: 6px;
     transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: 'Arial', sans-serif;
   }
 
   input[type="text"]:focus, textarea:focus {
@@ -59,6 +61,7 @@
     box-shadow: 0 0 0 3px rgba(0,181,173,0.2);
   }
 
+  /* Slider styling */
   .slider-container {
     margin-top: 10px;
     text-align: center;
@@ -73,7 +76,18 @@
     outline: none;
   }
 
-  .slider::-webkit-slider-thumb,
+  /* ✅ Purple slider button */
+  .slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #662d91;
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+
   .slider::-moz-range-thumb {
     width: 22px;
     height: 22px;
@@ -88,7 +102,7 @@
     margin-top: 8px;
     font-size: 18px;
     font-weight: 600;
-    color: #00b5ad;
+    color: #662d91;
   }
 
   .actions {
@@ -145,8 +159,9 @@
         <div class="score-value" id="scoreValue">5</div>
       </div>
 
-      <label for="comments">Comments (optional)</label>
-      <textarea id="comments" name="Comments" rows="3" placeholder="Tell us why..."></textarea>
+      <!-- ✅ Standard font label -->
+      <label for="comments" style="font-family: Arial, sans-serif;">Comments (optional)</label>
+      <textarea id="comments" name="Comments" rows="3" placeholder="Tell us why..." style="font-family: Arial, sans-serif;"></textarea>
 
       <div class="actions">
         <button type="submit">Submit</button>
@@ -159,7 +174,6 @@
 
 <script>
 (function(){
-  // ✅ Connected to your Google Apps Script
   const endpoint = "https://script.google.com/macros/s/AKfycbw3iuX0AX0BxwaRjTdFxGJLfAU-AcbF1AXq_yVsdhSAzo2ow4qmTbHcss1j5_x39j2S/exec";
   const form = document.getElementById('npsForm');
   const msg = document.getElementById('messageArea');
@@ -196,9 +210,9 @@
 
     try {
       msg.textContent = 'Submitting...';
-      const res = await fetch(endpoint, {
+      await fetch(endpoint, {
         method: 'POST',
-        mode: 'no-cors', // 👈 Required for Google Apps Script
+        mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
@@ -215,3 +229,4 @@
 </script>
 </body>
 </html>
+
